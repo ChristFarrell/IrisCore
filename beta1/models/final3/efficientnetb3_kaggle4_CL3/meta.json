@@ -1,0 +1,144 @@
+{
+  "name": "efficientnetb3_kaggle4_CL3",
+  "arch": "efficientnet_b3",
+  "image_size": 300,
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "num_classes": 3,
+  "num_logits": 4,
+  "fine_names": [
+    "Normal",
+    "Cataract",
+    "Other/diabetic_retinopathy",
+    "Other/glaucoma"
+  ],
+  "fine_to_coarse": [
+    0,
+    1,
+    2,
+    2
+  ],
+  "serving_note": "model.pth has num_logits outputs. softmax -> sum the probabilities of the fine classes into 3 classes using fine_to_coarse (Other = DR + Glaucoma).",
+  "label_map": {
+    "0": "Normal",
+    "1": "Cataract",
+    "2": "Other"
+  },
+  "dataset": "kaggle cataract-dr-normal-glaucoma (pre-split train/val/test)",
+  "square_pad": true,
+  "training": "centralized_two_stage",
+  "preprocessing_order": [
+    "square_pad",
+    "resize",
+    "clahe"
+  ],
+  "clahe": {
+    "enabled": true,
+    "clip_limit": 2.0,
+    "tile_grid": [
+      8,
+      8
+    ],
+    "channel": "L (LAB)",
+    "retina_mask_thresh": 10,
+    "note": "serving MUST use identical preprocessing"
+  },
+  "balance": "no_undersampling; loss_weights=coarse_balanced",
+  "stability": {
+    "optimizer": "AdamW",
+    "weight_decay": 0.01,
+    "lr_head": 0.0003,
+    "lr_head_stage2": 0.0001,
+    "lr_backbone": 2e-05,
+    "schedule": "cosine_with_warmup",
+    "ema_decay": 0.998,
+    "accum_steps": 2,
+    "freeze_bn_stats": true,
+    "head_norm": "LayerNorm",
+    "unfreeze_last_n_blocks": 3,
+    "weights_saved": "EMA"
+  },
+  "regularization": {
+    "drop_path_rate": 0.2,
+    "head_dropout": 0.5,
+    "mixup_alpha": 0.2,
+    "mixup_prob": 0.4,
+    "erase_prob": 0.25,
+    "label_smoothing": 0.1
+  },
+  "best_epoch": 29,
+  "test_accuracy": 0.9436619718309859,
+  "test_accuracy_fine": 0.9413145539906104,
+  "test_macro_f1": 0.9427186179507107,
+  "test_macro_auc": 0.9937858585167819,
+  "train_accuracy_check_overfit": 0.9578947368421052,
+  "per_class": {
+    "Normal": {
+      "precision": 0.8956521739130435,
+      "recall": 0.9537037037037037,
+      "f1-score": 0.9237668161434978
+    },
+    "Cataract": {
+      "precision": 0.9705882352941176,
+      "recall": 0.9428571428571428,
+      "f1-score": 0.9565217391304348
+    },
+    "Other": {
+      "precision": 0.9569377990430622,
+      "recall": 0.9389671361502347,
+      "f1-score": 0.9478672985781991
+    }
+  },
+  "confusion_matrix": [
+    [
+      103,
+      0,
+      5
+    ],
+    [
+      2,
+      99,
+      4
+    ],
+    [
+      10,
+      3,
+      200
+    ]
+  ],
+  "confusion_matrix_fine": [
+    [
+      103,
+      0,
+      1,
+      4
+    ],
+    [
+      2,
+      99,
+      0,
+      4
+    ],
+    [
+      2,
+      0,
+      109,
+      0
+    ],
+    [
+      9,
+      3,
+      0,
+      90
+    ]
+  ],
+  "seed": 42
+}
